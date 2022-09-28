@@ -13,14 +13,15 @@
 
 
 
-// const gridFactory = () => {
-//     const grid = document.createElement("div");
-//     grid.classList.add("grid");
+const gridFactory = () => {
+    const grid = document.createElement("div");
+    grid.classList.add("grid");
 
-//     // const markGrid = () => grid.textContent = "x";
-//     // const clearGrid = () => grid.textContent = "";
-//     return { sayHello };
-// };
+    const getGrid = () => grid;
+    const markGrid = () => grid.textContent = "x";
+    const clearGrid = () => grid.textContent = "";
+    return { getGrid, markGrid, clearGrid};
+};
 
 // function markGrid(grid) {
 
@@ -39,9 +40,9 @@ const gameboard = (() => {
 
         let i = 0;
         while (i < 9) {  
-            const grid = document.createElement("div");
-            grid.classList.add("grid");
-            boardDiv.appendChild(grid);
+            const gridObj = gridFactory();
+            // gridObj.markGrid();
+            boardDiv.appendChild(gridObj.getGrid());
 
             i++;
         };
