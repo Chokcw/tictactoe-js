@@ -1,63 +1,129 @@
 
 
-// game start - create grid with 9 boxes, array 0-8
-// board
-// array 0-8
-
-// check player turn
-
-
-// function GameBoard() {
-//     this.board = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
-// }
-
-
-
-const gridFactory = () => {
-    const grid = document.createElement("div");
-    grid.classList.add("grid");
-
-    const getGrid = () => grid;
-    const markGrid = () => grid.textContent = "x";
-    const clearGrid = () => grid.textContent = "";
-    return { getGrid, markGrid, clearGrid};
-};
-
-// function markGrid(grid) {
-
-// }
-
-
-
 const gameboard = (() => {
-    let _turn = 1;
-    let _boardArray = [["", "", ""], ["", "", ""], ["", "", ""]]
 
-    const displayBoard = () => {
+    const _boardDiv = document.createElement("div");
+    const _boardArray = [["", "", ""], ["", "", ""], ["", "", ""]]
+
+    const createBoard = () => {
+        
         const mainDiv = document.querySelector(".main");
-        const boardDiv = document.createElement("div");
-        boardDiv.classList.add("board");
+        _boardDiv.classList.add("board");
 
         let i = 0;
-        while (i < 9) {  
-            const gridObj = gridFactory();
-            // gridObj.markGrid();
-            boardDiv.appendChild(gridObj.getGrid());
+        while (i < 9) {
+            const grid = document.createElement("div");
+            grid.classList.add("grid");
+            grid.dataset.x = i % 3;
+            grid.dataset.y = Math.floor(i / 3);
 
+            _boardDiv.appendChild(grid);
             i++;
         };
-        mainDiv.appendChild(boardDiv);
-        // for x from 0 to 8, create a div and add to boardDiv
-        // add boardDiv to main
-    };
+        mainDiv.appendChild(_boardDiv);        
+    }
 
-    // check legal move
-    // check for winner
-    //reset
+    const getBoard = () => _boardDiv;
+
+    const checkGridEmpty = (posY, posX) => {
+        
+        if (_boardArray[posY][posX] === "") {
+            return true;
+        }
+
+        return false;
+    }
+
+    const markGrid = (posY, posX, symbol) => {
+        _boardArray[posY][posX] = symbol;
+    }
+
+    const checkWinPattern = () => {
+        let i = 0;
+        while (i < 3) {
+            let j = 0;
+            let row = [];
+            let column = [];
+            
+            while (j < 3) {
+                row.push(_boardArray[i][j]);
+                column.push(_boardArray[j][i])
+                j++;
+            }
+
+            // console.log(`row: ${row}`);
+            // console.log(`column: ${column}`);
+            if ((row.every((symbol) => symbol === "X")  || row.every((symbol) => symbol === "O")) || 
+                (column.every((symbol) => symbol === "X") || column.every((symbol) => symbol === "O"))) {
+                return true;
+            }
+            i++;
+        }
+        return false;
+    }
+
+    // const hideBoard = () => {
+
+    // }
+
+    // const clearBoard = () => {
+
+    // }
+
     
-    return {
-        displayBoard,
-    };
+    return { createBoard, getBoard, checkGridEmpty, markGrid, checkWinPattern };
 })();
 
-gameboard.displayBoard();
+
+
+const gameplay = (() => {
+
+    // create board
+    const _playerSymbols = ["X", "O"]
+    let _turn = 0;
+    let _currentplayerSymbol = _playerSymbols[_turn % 2];
+    
+    const setup = () => {
+        board = gameboard;
+        board.createBoard();
+        board.getBoard().addEventListener("click", processPlayerMove);
+    }
+
+    const processPlayerMove = (e) => {
+        console.log(`turn: ${_turn}`)
+        grid = e.target;
+        if (board.checkGridEmpty(grid.dataset.y, grid.dataset.x)) {
+            board.markGrid(grid.dataset.y, grid.dataset.x, _currentplayerSymbol);
+            grid.textContent = _currentplayerSymbol;
+            checkWinner();
+
+            _turn++;
+            _currentplayerSymbol = _playerSymbols[_turn % 2]
+        } else {
+            console.log("Grid is marked");
+        }
+    }
+
+    const checkWinner = () => {
+        // board.checkWinPattern()
+        if (board.checkWinPattern() === true) {
+            console.log("Winning pattern!")
+        }
+        
+        // for row and column and diagonal, check for same shape
+        // or draw
+        // if yes, gameEnd()
+    }
+
+    // const gameEnd = () => {
+    //     // winner = 
+    //     // board.hideGrid()
+    // }
+    
+    
+    return { setup }; 
+})();
+
+
+
+gameplay.setup();
