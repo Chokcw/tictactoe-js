@@ -67,12 +67,9 @@ const gameboard = (() => {
         (diagonalNeg.every((symbol) => symbol === "X") || diagonalNeg.every((symbol) => symbol === "O"))) {
             return true;
         }
+        
         return false;
     }
-
-    // const hideBoard = () => {
-
-    // }
 
     // const clearBoard = () => {
 
@@ -84,56 +81,74 @@ const gameboard = (() => {
 
 
 const playerFactory = (name, symbol) => {
-    return { name, symbol };
+    let score = 0;
+    return { name, symbol, score };
 };
 
 
 const gameplay = (() => {
 
     let _turn = 0;
-    let playerSymbols = undefined;
-    let currentplayerSymbol = undefined
+    let _isGameActive = false;
+    const player1 = playerFactory("Player O", "O");
+    const player2 = playerFactory("Player X", "X");
+    const _players = [player1, player2];
+    let _currentPlayer = _players[_turn % 2];
+    let _resultSpan = document.querySelector(".result");
     
-    const setup = (player1, player2) => {
-        console.log(player1)
+    const setup = () => {
+        _isGameActive = true;
         board = gameboard;
         board.createBoard();
         board.getBoard().addEventListener("click", processPlayerMove);
-
-        playerSymbols = [player1.symbol, player2.symbol]
-        currentplayerSymbol = playerSymbols[_turn % 2];
     }
 
     const processPlayerMove = (e) => {
         console.log(`turn: ${_turn}`)
         grid = e.target;
-        if (board.checkGridEmpty(grid.dataset.y, grid.dataset.x)) {
-            board.markGrid(grid.dataset.y, grid.dataset.x, currentplayerSymbol);
-            grid.textContent = currentplayerSymbol;
-            checkWinner();
+        if (_isGameActive === true) {
+            if (board.checkGridEmpty(grid.dataset.y, grid.dataset.x)) {
+                board.markGrid(grid.dataset.y, grid.dataset.x, _currentPlayer.symbol);
+                content = document.createElement("p");
+                content.textContent = _currentPlayer.symbol;
+                grid.appendChild(content);
 
-            _turn++;
-            // if (_turn === 8) {
-            //     declareDraw();
-            // }
-            currentplayerSymbol = playerSymbols[_turn % 2]
-        } else {
-            console.log("Grid is marked");
+                checkWinner();
+
+                _turn++;
+                if (_turn === 9) {
+                    declareDraw();
+                    _isGameActive = false;
+                }
+                _currentPlayer = _players[_turn % 2];
+            } else {
+                console.log("Grid is marked");
+            }
         }
     }
 
     const checkWinner = () => {
         if (board.checkWinPattern() === true) {
-            console.log("Winning pattern!")
+            console.log("Winning pattern!");
+            _isGameActive = false;
             // declareWinner()
         }
-        
-        // if yes, gameEnd()
     }
 
     // const declareWinner = () => {
     //     // winner = 
     //     // board.hideGrid()
+    // }
+
+    const declareDraw = () => {
+        _resultSpan.textContent = "Draw!"
+        _resultSpan.classList.toggle('display-element');
+    }
+
+    // const restartGame = () => {
+        // _resultSpan.classList.toggle('display-element');
+        // setup()
+
     // }
     
     
@@ -141,8 +156,4 @@ const gameplay = (() => {
 })();
 
 
-const player1 = playerFactory("Player O", "O")
-const player2 = playerFactory("Player X", "X")
-// console.log(player1)
-// gameplay(player1, player2);
-gameplay.setup(player1, player2);
+gameplay.setup();
