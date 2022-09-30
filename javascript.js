@@ -40,6 +40,9 @@ const gameboard = (() => {
 
     const checkWinPattern = () => {
         let i = 0;
+        let diagonalPos = [];
+        let diagonalNeg = [];
+
         while (i < 3) {
             let j = 0;
             let row = [];
@@ -50,14 +53,19 @@ const gameboard = (() => {
                 column.push(_boardArray[j][i])
                 j++;
             }
-
-            // console.log(`row: ${row}`);
-            // console.log(`column: ${column}`);
+            
             if ((row.every((symbol) => symbol === "X")  || row.every((symbol) => symbol === "O")) || 
                 (column.every((symbol) => symbol === "X") || column.every((symbol) => symbol === "O"))) {
                 return true;
             }
+            diagonalPos.push(_boardArray[i][i]);
+            diagonalNeg.push(_boardArray[2-i][2-i]);
             i++;
+        }
+
+        if ((diagonalPos.every((symbol) => symbol === "X")  || diagonalPos.every((symbol) => symbol === "O")) || 
+        (diagonalNeg.every((symbol) => symbol === "X") || diagonalNeg.every((symbol) => symbol === "O"))) {
+            return true;
         }
         return false;
     }
@@ -75,47 +83,55 @@ const gameboard = (() => {
 })();
 
 
+const playerFactory = (name, symbol) => {
+    return { name, symbol };
+};
+
 
 const gameplay = (() => {
 
-    // create board
-    const _playerSymbols = ["X", "O"]
     let _turn = 0;
-    let _currentplayerSymbol = _playerSymbols[_turn % 2];
+    let playerSymbols = undefined;
+    let currentplayerSymbol = undefined
     
-    const setup = () => {
+    const setup = (player1, player2) => {
+        console.log(player1)
         board = gameboard;
         board.createBoard();
         board.getBoard().addEventListener("click", processPlayerMove);
+
+        playerSymbols = [player1.symbol, player2.symbol]
+        currentplayerSymbol = playerSymbols[_turn % 2];
     }
 
     const processPlayerMove = (e) => {
         console.log(`turn: ${_turn}`)
         grid = e.target;
         if (board.checkGridEmpty(grid.dataset.y, grid.dataset.x)) {
-            board.markGrid(grid.dataset.y, grid.dataset.x, _currentplayerSymbol);
-            grid.textContent = _currentplayerSymbol;
+            board.markGrid(grid.dataset.y, grid.dataset.x, currentplayerSymbol);
+            grid.textContent = currentplayerSymbol;
             checkWinner();
 
             _turn++;
-            _currentplayerSymbol = _playerSymbols[_turn % 2]
+            // if (_turn === 8) {
+            //     declareDraw();
+            // }
+            currentplayerSymbol = playerSymbols[_turn % 2]
         } else {
             console.log("Grid is marked");
         }
     }
 
     const checkWinner = () => {
-        // board.checkWinPattern()
         if (board.checkWinPattern() === true) {
             console.log("Winning pattern!")
+            // declareWinner()
         }
         
-        // for row and column and diagonal, check for same shape
-        // or draw
         // if yes, gameEnd()
     }
 
-    // const gameEnd = () => {
+    // const declareWinner = () => {
     //     // winner = 
     //     // board.hideGrid()
     // }
@@ -125,5 +141,8 @@ const gameplay = (() => {
 })();
 
 
-
-gameplay.setup();
+const player1 = playerFactory("Player O", "O")
+const player2 = playerFactory("Player X", "X")
+// console.log(player1)
+// gameplay(player1, player2);
+gameplay.setup(player1, player2);
