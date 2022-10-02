@@ -3,12 +3,13 @@
 const gameboard = (() => {
 
     const _boardDiv = document.createElement("div");
-    const _boardArray = [["", "", ""], ["", "", ""], ["", "", ""]]
+    let _boardArray = [["", "", ""], ["", "", ""], ["", "", ""]]
 
     const createBoard = () => {
         
         const mainDiv = document.querySelector(".main");
         _boardDiv.classList.add("board");
+        _boardDiv.textContent = '';
 
         let i = 0;
         while (i < 9) {
@@ -71,12 +72,12 @@ const gameboard = (() => {
         return false;
     }
 
-    // const clearBoard = () => {
-
-    // }
+    const clearBoard = () => {
+        _boardArray = [["", "", ""], ["", "", ""], ["", "", ""]]
+    }
 
     
-    return { createBoard, getBoard, checkGridEmpty, markGrid, checkWinPattern };
+    return { createBoard, getBoard, checkGridEmpty, markGrid, checkWinPattern, clearBoard };
 })();
 
 
@@ -94,19 +95,25 @@ const gameplay = (() => {
     const player2 = playerFactory("Player X", "X");
     const _players = [player1, player2];
     let _currentPlayer = _players[_turn % 2];
-    let _resultSpan = document.querySelector(".result");
+    let _scoreDiv = document.querySelector(".score");
+    let _resultDiv = document.querySelector(".result");
+    const _restartButton = document.querySelector(".restart-button");
     
     const setup = () => {
+        _turn = 0;
         _isGameActive = true;
+        _currentPlayer = _players[_turn % 2];
         board = gameboard;
+        board.clearBoard();
         board.createBoard();
+        displayScore();
         board.getBoard().addEventListener("click", processPlayerMove);
     }
 
     const processPlayerMove = (e) => {
-        console.log(`turn: ${_turn}`)
-        grid = e.target;
-        if (_isGameActive === true) {
+        if (_isGameActive === true && e.target.classList.contains("grid")) {
+            console.log(`turn: ${_turn}`);
+            grid = e.target;
             if (board.checkGridEmpty(grid.dataset.y, grid.dataset.x)) {
                 board.markGrid(grid.dataset.y, grid.dataset.x, _currentPlayer.symbol);
                 content = document.createElement("p");
@@ -116,7 +123,7 @@ const gameplay = (() => {
                 checkWinner();
 
                 _turn++;
-                if (_turn === 9) {
+                if (_turn === 9 && _isGameActive === true) {
                     declareDraw();
                     _isGameActive = false;
                 }
@@ -131,26 +138,48 @@ const gameplay = (() => {
         if (board.checkWinPattern() === true) {
             console.log("Winning pattern!");
             _isGameActive = false;
-            // declareWinner()
+            declareWinner();
         }
     }
 
-    // const declareWinner = () => {
-    //     // winner = 
-    //     // board.hideGrid()
-    // }
-
-    const declareDraw = () => {
-        _resultSpan.textContent = "Draw!"
-        _resultSpan.classList.toggle('display-element');
+    const declareWinner = () => {
+        winner = _currentPlayer;
+        _currentPlayer.score += 1;
+        _resultDiv.classList.toggle('display-element');
+        displayScore();
+        
+        _resultDiv.textContent = `${_currentPlayer.name} wins!`
+        displayRestart();
+        // board.hideGrid()
     }
 
-    // const restartGame = () => {
-        // _resultSpan.classList.toggle('display-element');
-        // setup()
+    const declareDraw = () => {
+        _resultDiv.textContent = "Draw!"
+        _resultDiv.classList.toggle('display-element');
+        displayRestart();
+    }
 
-    // }
-    
+    const displayScore = () => {
+        _scoreDiv.textContent = '';
+        for (player of _players) {
+            let playerDiv = document.createElement("div");
+            playerDiv.classList.add("player-score");
+            playerDiv.textContent = `${player.name}: ${player.score}`;
+            _scoreDiv.appendChild(playerDiv);
+        }
+        
+    }
+
+    const displayRestart = () => {
+        _restartButton.classList.toggle('display-element');
+        _restartButton.addEventListener("click", restartGame);
+    }
+
+    const restartGame = () => {
+        setup();
+        _resultDiv.classList.toggle('display-element');
+        _restartButton.classList.toggle('display-element');
+    }
     
     return { setup }; 
 })();

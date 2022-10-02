@@ -32,28 +32,26 @@
     padding: 20px
 } */
 
-button {
-    /* margin-left: 20px; */
-    border: none;
-    /* background: none; */
-    background-color: #0f766e;
-    color: #FFFFFF;
-    padding: 8px;
-    border-radius: 8px;
-    width: 80px;
-    text-align: center;
-    cursor: pointer;
-}
-
 .container {
-    display: flex;
+    /* display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: center; */
+    display: grid;
+    grid-template-rows: 1fr 6fr 1fr 1fr;
     align-items: center;
     background: #E5E7EB;
     width: 40%;
     border-radius: 8px;
-    
+    justify-items: center;
+}
+
+.score {
+    display: flex;
+    justify-content: space-around;
+}
+
+.player-score {
+    margin: 0 40px;
 }
 
 .main {
@@ -88,6 +86,19 @@ button {
 
 .grid p {
     font-size: 36px;
+}
+
+button {
+    /* margin-left: 20px; */
+    border: none;
+    /* background: none; */
+    background-color: #0f766e;
+    color: #FFFFFF;
+    padding: 8px;
+    border-radius: 8px;
+    width: 120px;
+    text-align: center;
+    cursor: pointer;
 }
 
 .display-element {
